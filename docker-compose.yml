@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lalapdart-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lalapdart
+      POSTGRES_PASSWORD: Lalapdart123
+      POSTGRES_DB: pengajuan_mobile_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - lalapdart_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lalapdart -d pengajuan_mobile_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  lalapdart_pg_data:
+    name: lalapdart_pg_data
