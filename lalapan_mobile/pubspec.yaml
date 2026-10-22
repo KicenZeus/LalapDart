@@ -1,0 +1,48 @@
+name: lalapan_mobile
+description: "Sistem Terpadu Pelaporan Kelahiran & Penerbitan Akta Disdukcapil – Faskes (Lalapan Cross-Platform)"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+
+  # Networking & HTTP
+  dio: ^5.7.0
+
+  # Routing & Navigation
+  go_router: ^14.6.2
+
+  # Secure Storage (Keychain iOS & Keystore Android)
+  flutter_secure_storage: ^9.2.2
+
+  # Date & Utility
+  intl: ^0.19.0
+  uuid: ^4.5.1
+
+  # File & Image Picker (Native Camera & Storage)
+  image_picker: ^1.1.2
+  file_picker: ^8.1.4
+
+  # Interactive Document Viewer (Pinch-to-zoom, Pan, Rotate)
+  photo_view: ^0.15.0
+
+  # Icons
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
