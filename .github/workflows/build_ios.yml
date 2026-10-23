@@ -7,6 +7,7 @@ jobs:
   build-ios:
     name: Compile iOS Unsigned IPA
     runs-on: macos-14
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -17,12 +18,17 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Configure Flutter (Pure CocoaPods)
+        run: |
+          flutter config --no-enable-swift-package-manager
+
       - name: Install Dependencies
         run: |
           cd lalapan_mobile
           flutter pub get
           cd ios
           pod install --repo-update
+          cd ..
 
       - name: Build iOS Application (No Codesign)
         run: |
@@ -34,7 +40,9 @@ jobs:
           cd lalapan_mobile/build/ios/iphoneos
           mkdir -p Payload
           cp -r Runner.app Payload/
-          zip -r Lalapan_iOS_unsigned.ipa Payload
+          zip -r -q Lalapan_iOS_unsigned.ipa Payload
+          echo "IPA packaging completed successfully."
+          ls -lh Lalapan_iOS_unsigned.ipa
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
