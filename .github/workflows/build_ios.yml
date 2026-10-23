@@ -14,7 +14,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5'
           channel: 'stable'
           cache: true
 
@@ -23,7 +22,7 @@ jobs:
           cd lalapan_mobile
           flutter pub get
           cd ios
-          pod install
+          pod install --repo-update
 
       - name: Build iOS Application (No Codesign)
         run: |
