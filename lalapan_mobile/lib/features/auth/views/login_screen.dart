@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/config/app_config.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -21,6 +22,94 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showServerSettingsDialog() async {
+    final urlCtrl = TextEditingController(text: AppConfig.apiBaseUrl);
+    final messenger = ScaffoldMessenger.of(context);
+
+    await showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.settings_ethernet, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text('Alamat Server Backend', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Pilih mode koneksi backend:',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ActionChip(
+                        avatar: const Icon(Icons.usb, size: 16),
+                        label: const Text('USB (127.0.0.1:5055)'),
+                        onPressed: () {
+                          setDialogState(() {
+                            urlCtrl.text = 'http://127.0.0.1:5055/api';
+                          });
+                        },
+                      ),
+                      ActionChip(
+                        avatar: const Icon(Icons.wifi, size: 16),
+                        label: const Text('Wi-Fi (192.168.23.33)'),
+                        onPressed: () {
+                          setDialogState(() {
+                            urlCtrl.text = 'http://192.168.23.33:5055/api';
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: urlCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Base URL API',
+                      hintText: 'http://127.0.0.1:5055/api',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogCtx),
+                  child: const Text('Batal'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newUrl = urlCtrl.text.trim();
+                    if (newUrl.isNotEmpty) {
+                      await ref.read(authProvider.notifier).updateServerUrl(newUrl);
+                      if (mounted) setState(() {});
+                      if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+                      messenger.showSnackBar(
+                        SnackBar(content: Text('Alamat server diubah: ${AppConfig.apiBaseUrl}')),
+                      );
+                    }
+                  },
+                  child: const Text('Simpan'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _handleLogin() async {
@@ -181,6 +270,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Tombol Pengaturan Server URL
+                        Center(
+                          child: InkWell(
+                            onTap: _showServerSettingsDialog,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.settings_ethernet, size: 14, color: Colors.blue.shade700),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      'Server: ${AppConfig.apiBaseUrl}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.blue.shade800,
+                                        fontWeight: FontWeight.w600,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],

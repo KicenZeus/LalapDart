@@ -49,6 +49,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Inisialisasi sesi dari penyimpanan aman (Keychain / Keystore)
   Future<void> initAuth() async {
     try {
+      await _apiClient.loadSavedBaseUrl();
       final token = await _apiClient.getToken();
       final userDataStr = await _apiClient.getUserData();
 
@@ -65,6 +66,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _apiClient.clearAuthData();
     }
     state = state.copyWith(isInitialized: true, clearUser: true);
+  }
+
+  Future<void> updateServerUrl(String newUrl) async {
+    await _apiClient.setBaseUrl(newUrl);
+    state = state.copyWith(errorMessage: null);
   }
 
   /// Proses Login Pengguna
@@ -94,7 +100,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       return true;
     } on DioException catch (e) {
-      final message = e.response?.data?['message'] ?? 'Gagal masuk. Periksa username dan sandi.';
+      String message;
+      if (e.response != null) {
+        final serverMsg = e.response?.data?['message'];
+        if (serverMsg != null && serverMsg.toString().isNotEmpty) {
+          message = serverMsg.toString();
+        } else if (e.response?.statusCode == 401) {
+          message = 'Username atau kata sandi salah. Silakan coba lagi.';
+        } else if (e.response?.statusCode == 403) {
+          message = 'Akun Anda telah dinonaktifkan. Hubungi Admin Dukcapil.';
+        } else {
+          message = 'Server merespons error (${e.response?.statusCode}).';
+        }
+      } else {
+        message = 'Tidak dapat menghubungi server (${_apiClient.dio.options.baseUrl}). Pastikan kabel USB ADB Reverse aktif atau atur alamat server yang sesuai.';
+      }
+
       state = state.copyWith(
         isLoading: false,
         errorMessage: message,

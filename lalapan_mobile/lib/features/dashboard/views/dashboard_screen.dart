@@ -200,6 +200,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   const SizedBox(height: 10),
                 ],
 
+                if (user?.isAdmin == true) ...[
+                  _buildMenuTile(
+                    title: 'Manajemen Akun Pengguna',
+                    subtitle: 'Kelola akun petugas faskes, verifikator, dan reset password',
+                    icon: Icons.manage_accounts,
+                    color: Colors.deepOrange,
+                    onTap: () => context.go('/admin/users'),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildMenuTile(
+                    title: 'Master Instansi & 29 Faskes',
+                    subtitle: 'Data 3 RSUD dan 26 Puskesmas Kabupaten Madiun',
+                    icon: Icons.domain,
+                    color: Colors.brown.shade700,
+                    onTap: () => context.go('/admin/institutions'),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
                 _buildMenuTile(
                   title: 'Portal Pelacakan Publik',
                   subtitle: 'Simulasikan pencarian berkas seperti di sisi warga',

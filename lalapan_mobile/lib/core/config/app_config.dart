@@ -9,29 +9,29 @@ class AppConfig {
   static const String localNetworkHost = '192.168.23.33';
   static const int backendPort = 5055;
 
+  static String? customBaseUrl;
+
   /// Base URL backend REST API otomatis menyesuaikan target platform
-  static String get apiBaseUrl {
+  static String get defaultBaseUrl {
     if (kIsWeb) {
-      // Browser di laptop bisa langsung pakai localhost atau IP LAN
       return 'http://127.0.0.1:$backendPort/api';
     }
 
     try {
       if (Platform.isAndroid) {
-        // Untuk perangkat fisik HP Android di jaringan Wi-Fi lokal yang sama
-        return 'http://$localNetworkHost:$backendPort/api';
+        // Default 127.0.0.1 (ADB Reverse via USB) untuk keandalan maksimal tanpa blokir firewall
+        return 'http://127.0.0.1:$backendPort/api';
       } else if (Platform.isIOS) {
-        // Untuk perangkat fisik iPhone di jaringan Wi-Fi lokal yang sama
         return 'http://$localNetworkHost:$backendPort/api';
       }
-    } catch (_) {
-      // Fallback
-    }
+    } catch (_) {}
 
-    return 'http://$localNetworkHost:$backendPort/api';
+    return 'http://127.0.0.1:$backendPort/api';
   }
 
+  static String get apiBaseUrl => customBaseUrl ?? defaultBaseUrl;
+
   /// Timeout jaringan
-  static const Duration connectTimeout = Duration(seconds: 15);
+  static const Duration connectTimeout = Duration(seconds: 10);
   static const Duration receiveTimeout = Duration(seconds: 15);
 }

@@ -8,6 +8,9 @@ import '../features/public_tracking/views/public_tracking_screen.dart';
 import '../features/application/views/application_list_screen.dart';
 import '../features/application/views/application_form_screen.dart';
 import '../features/verification/views/verification_queue_screen.dart';
+import '../features/verification/views/verification_detail_screen.dart';
+import '../features/admin/views/user_management_screen.dart';
+import '../features/admin/views/institution_master_screen.dart';
 import '../features/document_viewer/views/document_viewer_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -67,14 +70,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/applications/new',
         builder: (context, state) => const ApplicationFormScreen(),
       ),
+      GoRoute(
+        path: '/applications/edit/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return ApplicationFormScreen(editApplicationId: id);
+        },
+      ),
 
       // 5. Modul Verifikasi Dukcapil
       GoRoute(
         path: '/verification',
         builder: (context, state) => const VerificationQueueScreen(),
       ),
+      GoRoute(
+        path: '/verification/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return VerificationDetailScreen(applicationId: id);
+        },
+      ),
 
-      // 6. Interactive Document Viewer
+      // 6. Modul Admin
+      GoRoute(
+        path: '/admin/users',
+        builder: (context, state) => const UserManagementScreen(),
+      ),
+      GoRoute(
+        path: '/admin/institutions',
+        builder: (context, state) => const InstitutionMasterScreen(),
+      ),
+
+      // 7. Interactive Document Viewer
       GoRoute(
         path: '/viewer',
         builder: (context, state) {
@@ -82,7 +109,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return DocumentViewerScreen(
             title: extra['title'] ?? 'Pratinjau Dokumen',
             fileUrl: extra['fileUrl'] ?? '',
-            token: extra['token'],
+            token: extra['token'] ?? authState.token,
           );
         },
       ),

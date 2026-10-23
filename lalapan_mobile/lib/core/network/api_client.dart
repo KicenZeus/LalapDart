@@ -68,4 +68,30 @@ class ApiClient {
     await secureStorage.delete(key: tokenKey);
     await secureStorage.delete(key: userKey);
   }
+
+  static const String serverUrlKey = 'lalapan_custom_server_url';
+
+  Future<void> setBaseUrl(String newUrl) async {
+    String cleanUrl = newUrl.trim();
+    if (!cleanUrl.endsWith('/api')) {
+      if (cleanUrl.endsWith('/')) {
+        cleanUrl = '${cleanUrl}api';
+      } else {
+        cleanUrl = '$cleanUrl/api';
+      }
+    }
+    AppConfig.customBaseUrl = cleanUrl;
+    dio.options.baseUrl = cleanUrl;
+    await secureStorage.write(key: serverUrlKey, value: cleanUrl);
+  }
+
+  Future<void> loadSavedBaseUrl() async {
+    try {
+      final saved = await secureStorage.read(key: serverUrlKey);
+      if (saved != null && saved.trim().isNotEmpty) {
+        AppConfig.customBaseUrl = saved.trim();
+        dio.options.baseUrl = saved.trim();
+      }
+    } catch (_) {}
+  }
 }

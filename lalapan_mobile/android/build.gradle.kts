@@ -19,6 +19,27 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+subprojects {
+    val setCompileSdk = {
+        project.extensions.findByName("android")?.let { ext ->
+            try {
+                ext.javaClass.getMethod("compileSdkVersion", Int::class.javaPrimitiveType).invoke(ext, 36)
+            } catch (_: Exception) {
+                try {
+                    ext.javaClass.getMethod("setCompileSdk", Integer::class.java).invoke(ext, 36)
+                } catch (_: Exception) {}
+            }
+        }
+    }
+    if (project.state.executed) {
+        setCompileSdk()
+    } else {
+        project.afterEvaluate {
+            setCompileSdk()
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

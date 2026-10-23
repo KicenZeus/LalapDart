@@ -1,4 +1,4 @@
-package com.example.lalapan_mobile
+package com.lalapan.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

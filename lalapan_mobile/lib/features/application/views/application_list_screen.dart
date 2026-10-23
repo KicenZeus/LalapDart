@@ -163,7 +163,9 @@ class _ApplicationListScreenState extends ConsumerState<ApplicationListScreen> {
                                   trailing: const Icon(Icons.chevron_right),
                                   onTap: () {
                                     if (item.status == 'DRAFT' || item.status == 'PERLU_PERBAIKAN') {
-                                      context.go('/applications/new');
+                                      context.push('/applications/edit/${item.id}');
+                                    } else {
+                                      context.push('/applications/edit/${item.id}');
                                     }
                                   },
                                 ),
